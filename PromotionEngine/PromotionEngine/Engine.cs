@@ -27,20 +27,21 @@ namespace PromotionEngine
 
             else
             {
-                Dictionary<decimal, List<Cart>> promotionListDictionary = new Dictionary<decimal, List<Cart>>();
+                SortedDictionary<decimal, List<Cart>> bestPromotion = new SortedDictionary<decimal, List<Cart>>();
+
                 foreach (var promo in _promotins.Select(s => s.SKUs))
                 {
                     var tmp = GetPromotionEligibleSKU(promo);
                     if (tmp.Count == 0) continue;
                     findOfferedTotal = GetTotalOfPromotionSKU(promo, tmp);
-                    promotionListDictionary.Add(findOfferedTotal, tmp);
+                    bestPromotion.Add(findOfferedTotal, tmp);
                     findOfferedTotal = 0;
 
                 }
-                 
-                    if (promotionListDictionary?.Count > 0)
+
+                    if (bestPromotion?.Count > 0)
                     {
-                        var best = promotionListDictionary.Last();
+                        var best = bestPromotion.Last();
                         findOfferedTotal = best.Key;
 
                         var nonpromotionsku = GetNonPromotionSKUs(best.Value);
@@ -48,6 +49,7 @@ namespace PromotionEngine
                     }
                     else
                         return _skus.Sum(s => s.Quanity * s.sku.Price);
+                
 
             }
             return findOfferedTotal;
