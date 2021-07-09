@@ -6,7 +6,7 @@ using PromotionEngine;
 namespace PromotionEngineTest
 {
     [TestClass]
-    public class UnitTest1
+    public class EngineTest
     {
         private List<Cart> products = new List<Cart>
         {
@@ -14,7 +14,6 @@ namespace PromotionEngineTest
             new Cart{ sku=new SKU{ Id='B',Price= 30M }, Quanity=1 },
             new Cart{ sku=new SKU{ Id='C',Price= 20M }, Quanity=8 }
         };
-
 
         private List<Promotion> promotins = new List<Promotion> {
                  new Promotion{ SKUs= new List<PromotinSkus>{ new PromotinSkus { Id = 'A', Count = 3 } },  DiscountPrice=130M },
@@ -42,7 +41,7 @@ namespace PromotionEngineTest
         }
 
         [TestMethod]
-        public void Verify_A_SKU_offer_total()
+        public void Verify_A_SKU_Promotion_total()
         {
 
             products = new List<Cart>
@@ -51,7 +50,6 @@ namespace PromotionEngineTest
             new Cart{ sku=new SKU{ Id='B',Price= 30M }, Quanity=1 },
             new Cart{ sku=new SKU{ Id='C',Price= 20M }, Quanity=8 }
         };
-
 
             promotins = new List<Promotion> {
                  new Promotion{ SKUs= new List<PromotinSkus>{ new PromotinSkus { Id = 'A', Count = 3 } },  DiscountPrice=130M },
@@ -62,7 +60,7 @@ namespace PromotionEngineTest
         }
 
         [TestMethod]
-        public void Verify_B_SKU_offer_total()
+        public void Verify_B_SKU_Promotion_total()
         {
 
             products = new List<Cart>
@@ -82,7 +80,7 @@ namespace PromotionEngineTest
         }
 
         [TestMethod]
-        public void Verify_TwoCombo_CD_SKU_offer_total()
+        public void Verify_TwoCombo_CD_SKU_Promotion_total()
         {
 
             products = new List<Cart>
@@ -92,7 +90,6 @@ namespace PromotionEngineTest
             new Cart{ sku=new SKU{ Id='C',Price= 20M }, Quanity=4 },
             new Cart{ sku=new SKU{ Id='D',Price= 15M }, Quanity=3 }
         };
-
 
             promotins = new List<Promotion> {
                 new Promotion{ SKUs= new List<PromotinSkus>{ new PromotinSkus { Id = 'C', Count = 2 }
@@ -105,7 +102,7 @@ namespace PromotionEngineTest
         }
 
         [TestMethod]
-        public void Verify_ThreeCombo__ACD_SKU_offer_total()
+        public void Verify_ThreeCombo__ACD_SKU_Promo_total()
         {
 
             products = new List<Cart>
@@ -130,7 +127,7 @@ namespace PromotionEngineTest
         }
 
         [TestMethod]
-        public void Verify_A_SKU_offer_total_with_nonEligibleCart()
+        public void Verify_A_SKU_Promotion_total_with_nonEligibleCart()
         {
 
             products = new List<Cart>
@@ -153,7 +150,7 @@ namespace PromotionEngineTest
         }
 
         [TestMethod]
-        public void Verify_Multiple_SKU_offer_total()
+        public void Verify_Multiple_SKU_Promotion_total()
         {
 
             products = new List<Cart>
@@ -175,11 +172,11 @@ namespace PromotionEngineTest
             };
 
             Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(540, engine.CalculateTotalOrderValue());
+            Assert.AreEqual(565, engine.CalculateTotalOrderValue());
         }
 
         [TestMethod]
-        public void Verify_BestPromotion_In_Multiple_SKU_offer_total()
+        public void Verify_BestPromotion_In_Multiple_SKU_Promotion_total()
         {
 
             products = new List<Cart>
@@ -190,6 +187,7 @@ namespace PromotionEngineTest
             new Cart{ sku=new SKU{ Id='D',Price= 15M }, Quanity=3 }
         };
 
+            
 
             promotins = new List<Promotion> {
 
@@ -201,7 +199,7 @@ namespace PromotionEngineTest
             };
 
             Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(520, engine.CalculateTotalOrderValue());
+            Assert.AreEqual(565, engine.CalculateTotalOrderValue());
         }
     }
 
