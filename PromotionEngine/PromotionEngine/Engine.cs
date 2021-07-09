@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using PromotionEngine.Models;
 using System.Linq;
+using System;
 
 namespace PromotionEngine
 {
@@ -16,6 +17,8 @@ namespace PromotionEngine
 
         public decimal CalculateTotalOrderValue()
         {
+            var findOfferedTotal = 0m;
+
             if (_skus == null || _skus?.Count == 0)
                 return 0M;
 
@@ -23,7 +26,68 @@ namespace PromotionEngine
                 return _skus.Sum(s => s.Quanity * s.sku.Price);
 
             else
-                return 0M;
+            {
+                foreach (var promo in _promotins.Select(s => s.SKUs))
+                {
+                    var tmp = promo.SelectMany(p => _skus.FindAll(s => p.Id == s.sku.Id && p.Count <= s.Quanity)).ToList();
+                    if (tmp.Count == 0) continue;
+                    findOfferedTotal = GetTotalOfPromotionSKU(promo,tmp);
+                    var nonpromotinskus= _skus.Except(tmp).ToList();
+                    findOfferedTotal += nonpromotinskus.Sum(s => s.sku.Price * s.Quanity);
+                    break;
+                }
+            }
+            return findOfferedTotal;
+        }
+
+        private decimal GetTotalOfPromotionSKU(List<PromotinSkus> promotinSkus, List<Cart> carts)
+        {
+            decimal totalAmount = 0M;
+            var intermediate =
+
+                 promotinSkus.Select(p => new
+                 {
+                     id = p.Id,
+
+                     promoteSKUQuality = p.Count,
+
+                     actualSKUQuality = carts.FirstOrDefault(s => p.Id == s.sku.Id).Quanity,
+
+                     SkuPrice = carts.FirstOrDefault(s => p.Id == s.sku.Id).sku.Price,
+
+                     quotient = carts.
+                 Where(s => p.Id == s.sku.Id).
+                 Sum(s => s.Quanity / p.Count),
+
+                     reminder = carts.
+                 Where(s => p.Id == s.sku.Id).
+                 Sum(s => s.Quanity % p.Count)
+                 });
+
+            var MinQuotient = intermediate.Min(m => m.quotient);
+
+            totalAmount += GetTotalAmount(MinQuotient, GetPromotionPrice(promotinSkus.ElementAt(0).Id));
+
+            foreach (var itm in intermediate)
+            {
+                var reminder = (itm.quotient - MinQuotient) * itm.promoteSKUQuality + itm.reminder;
+                totalAmount += GetTotalAmount(reminder, itm.SkuPrice);
+            }
+            return totalAmount;
+        }
+
+        private decimal GetPromotionPrice(char sku)
+        {
+            var tmp = _promotins.Select(p => new {
+                PromotinPrice = p.DiscountPrice,
+                SkuList = p.SKUs.Where(s => s.Id == sku)
+            });
+
+            return tmp.Where(t => t.SkuList.Count() > 0).Min(d => d.PromotinPrice);
+        }
+        private decimal GetTotalAmount(int qty, decimal price)
+        {
+            return qty * price;
         }
     }
 }
