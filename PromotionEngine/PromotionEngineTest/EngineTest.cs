@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using PromotionEngine.Models;
 using PromotionEngine;
+using PromotionEngine.Interface;
 
 namespace PromotionEngineTest
 {
@@ -23,7 +24,7 @@ namespace PromotionEngineTest
         public void Return_zero_Product_Is_Null()
         {
             Engine engine = new Engine(null, promotins);
-            Assert.AreEqual(0, engine.CalculateTotalOrderValue());
+            Assert.AreEqual(0, engine.CalculateCartTotalWithBestPromotion());
         }
 
         [TestMethod]
@@ -36,8 +37,8 @@ namespace PromotionEngineTest
             new Cart{ sku=new SKU{ Id='C',Price= 20M }, Quanity=1 }
         };
 
-            Engine engine = new Engine(products, null);
-            Assert.AreEqual(100, engine.CalculateTotalOrderValue());
+            IEngine engine = new Engine(products, null);
+            Assert.AreEqual(100, engine.CalculateCartTotalWithBestPromotion());
         }
 
         [TestMethod]
@@ -55,8 +56,8 @@ namespace PromotionEngineTest
                  new Promotion{ SKUs= new List<PromotinSkus>{ new PromotinSkus { Id = 'A', Count = 3 } },  DiscountPrice=130M },
         };
 
-            Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(420, engine.CalculateTotalOrderValue());
+            IEngine engine = new Engine(products, promotins);
+            Assert.AreEqual(420, engine.CalculateCartTotalWithBestPromotion());
         }
 
         [TestMethod]
@@ -75,8 +76,8 @@ namespace PromotionEngineTest
                 new Promotion{ SKUs= new List<PromotinSkus>{ new PromotinSkus { Id = 'B', Count = 2 } },  DiscountPrice=45M },
             };
 
-            Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(575, engine.CalculateTotalOrderValue());
+            IEngine engine = new Engine(products, promotins);
+            Assert.AreEqual(575, engine.CalculateCartTotalWithBestPromotion());
         }
 
         [TestMethod]
@@ -97,8 +98,8 @@ namespace PromotionEngineTest
                 ,new PromotinSkus{  Count=1, Id='D'} },  DiscountPrice=30M }
             };
 
-            Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(535, engine.CalculateTotalOrderValue());
+            IEngine engine = new Engine(products, promotins);
+            Assert.AreEqual(535, engine.CalculateCartTotalWithBestPromotion());
         }
 
         [TestMethod]
@@ -122,8 +123,8 @@ namespace PromotionEngineTest
                   new PromotinSkus{  Count=1, Id='D'} },  DiscountPrice=30M }
             };
 
-            Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(410, engine.CalculateTotalOrderValue());
+            IEngine engine = new Engine(products, promotins);
+            Assert.AreEqual(410, engine.CalculateCartTotalWithBestPromotion());
         }
 
         [TestMethod]
@@ -145,8 +146,8 @@ namespace PromotionEngineTest
                      new PromotinSkus { Id = 'A', Count = 7 }
             } } };
 
-            Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(380, engine.CalculateTotalOrderValue());
+            IEngine engine = new Engine(products, promotins);
+            Assert.AreEqual(380, engine.CalculateCartTotalWithBestPromotion());
         }
 
         [TestMethod]
@@ -171,8 +172,8 @@ namespace PromotionEngineTest
                      new PromotinSkus { Id = 'B', Count = 2 }},  DiscountPrice=45M }
             };
 
-            Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(540, engine.CalculateTotalOrderValue());
+            IEngine engine = new Engine(products, promotins);
+            Assert.AreEqual(520, engine.CalculateCartTotalWithMultiplePromotions());
         }
 
         [TestMethod]
@@ -198,8 +199,8 @@ namespace PromotionEngineTest
                      new PromotinSkus { Id = 'B', Count = 2 }},  DiscountPrice=45M }
             };
 
-            Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(540, engine.CalculateTotalOrderValue());
+            IEngine engine = new Engine(products, promotins);
+            Assert.AreEqual(540, engine.CalculateCartTotalWithBestPromotion());
         }
     }
 

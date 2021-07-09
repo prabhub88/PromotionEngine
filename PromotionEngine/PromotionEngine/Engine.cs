@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
-using PromotionEngine.Models;
 using System.Linq;
+using PromotionEngine.Models;
+using PromotionEngine.Interface;
 
 namespace PromotionEngine
 {
-    public class Engine
+    public class Engine :IEngine
     {
         List<Cart> _skus;
         List<Promotion> _promotins;
@@ -14,7 +15,49 @@ namespace PromotionEngine
             _promotins = promotins;
         }
 
-        public decimal CalculateTotalOrderValue()
+        public decimal CalculateCartTotalWithMultiplePromotions() {
+            var findOfferedTotal = 0m;
+
+            if (_skus == null || _skus?.Count == 0)
+                return 0M;
+
+            if (_promotins == null || _promotins?.Count == 0)
+                return _skus.Sum(s => s.Quanity * s.sku.Price);
+
+            else
+            {
+               Dictionary<decimal,List<Cart>> MultiplePromotions = new Dictionary<decimal, List<Cart>>(); 
+
+                foreach (var promo in _promotins.Select(s => s.SKUs))
+                {
+                    var tmp = GetPromotionEligibleSKU(promo);
+                    if (tmp.Count == 0) continue;
+                    decimal quotientPromotion = 0M; decimal reminderPromotin = 0M;
+                    GetTotalOfPromotionSKU(promo, tmp, out quotientPromotion, out reminderPromotin);
+                    MultiplePromotions.Add(quotientPromotion+reminderPromotin,tmp);
+                }
+
+                if (MultiplePromotions?.Count > 0)
+                {
+                    List<Cart> carts = new List<Cart>();
+                    foreach (var item in MultiplePromotions.Values.SelectMany(s => s))
+                    {
+                        carts.Add(item);
+                    }
+                    var best = MultiplePromotions.Select(s => s.Value);
+                    findOfferedTotal = MultiplePromotions.Sum(b => b.Key);
+
+                    var nonpromotionsku = GetNonPromotionSKUs(carts);
+                    findOfferedTotal += GetTotalOfNonPromotionSKUs(nonpromotionsku);
+                }
+                else
+                    return _skus.Sum(s => s.Quanity * s.sku.Price);
+
+
+            }
+            return findOfferedTotal;
+        }
+        public decimal CalculateCartTotalWithBestPromotion()
         {
             var findOfferedTotal = 0m;
 
@@ -47,9 +90,7 @@ namespace PromotionEngine
 
                     if (bestPromotion?.Count > 0)
                     {
-
-                    findOfferedTotal += reminderTotal;
-
+                        findOfferedTotal += reminderTotal;
                         var nonpromotionsku = GetNonPromotionSKUs(bestPromotion);
                         findOfferedTotal += GetTotalOfNonPromotionSKUs(nonpromotionsku);
                     }
