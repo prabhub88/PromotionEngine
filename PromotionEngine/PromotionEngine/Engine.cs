@@ -27,16 +27,28 @@ namespace PromotionEngine
 
             else
             {
+                Dictionary<decimal, List<Cart>> promotionListDictionary = new Dictionary<decimal, List<Cart>>();
                 foreach (var promo in _promotins.Select(s => s.SKUs))
                 {
                     var tmp = GetPromotionEligibleSKU(promo);
-                    if(tmp.Count > 0)
-                        findOfferedTotal = GetTotalOfPromotionSKU(promo, tmp);
-
-                    var nonpromotionsku = GetNonPromotionSKUs(tmp);
-                    findOfferedTotal += GetTotalOfNonPromotionSKUs(nonpromotionsku);
+                    if (tmp.Count == 0) continue;
+                    findOfferedTotal = GetTotalOfPromotionSKU(promo, tmp);
+                    promotionListDictionary.Add(findOfferedTotal, tmp);
+                    findOfferedTotal = 0;
 
                 }
+                 
+                    if (promotionListDictionary?.Count > 0)
+                    {
+                        var best = promotionListDictionary.Last();
+                        findOfferedTotal = best.Key;
+
+                        var nonpromotionsku = GetNonPromotionSKUs(best.Value);
+                        findOfferedTotal += GetTotalOfNonPromotionSKUs(nonpromotionsku);
+                    }
+                    else
+                        return _skus.Sum(s => s.Quanity * s.sku.Price);
+
             }
             return findOfferedTotal;
         }
