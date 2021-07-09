@@ -26,24 +26,31 @@ namespace PromotionEngine
 
             else
             {
-                SortedDictionary<decimal, List<Cart>> bestPromotion = new SortedDictionary<decimal, List<Cart>>();
+                List<Cart> bestPromotion = new List<Cart>();decimal reminderTotal = 0M;
 
                 foreach (var promo in _promotins.Select(s => s.SKUs))
                 {
                     var tmp = GetPromotionEligibleSKU(promo);
                     if (tmp.Count == 0) continue;
-                    findOfferedTotal = GetTotalOfPromotionSKU(promo, tmp);
-                    bestPromotion.Add(findOfferedTotal, tmp);
+                    decimal quotientPromotion = 0M;decimal reminderPromotin = 0M;
+                    GetTotalOfPromotionSKU(promo, tmp,out quotientPromotion,out reminderPromotin);
+                    if (quotientPromotion > findOfferedTotal)
+                    {
+                        findOfferedTotal = quotientPromotion;
+                        bestPromotion = tmp;
+                        reminderTotal = quotientPromotion + reminderPromotin;
+                    }
+
                     findOfferedTotal = 0;
 
                 }
 
                     if (bestPromotion?.Count > 0)
                     {
-                        var best = bestPromotion.Last();
-                        findOfferedTotal = best.Key;
 
-                        var nonpromotionsku = GetNonPromotionSKUs(best.Value);
+                    findOfferedTotal += reminderTotal;
+
+                        var nonpromotionsku = GetNonPromotionSKUs(bestPromotion);
                         findOfferedTotal += GetTotalOfNonPromotionSKUs(nonpromotionsku);
                     }
                     else
@@ -54,9 +61,9 @@ namespace PromotionEngine
             return findOfferedTotal;
         }
 
-        private decimal GetTotalOfPromotionSKU(List<PromotinSkus> promotinSkus, List<Cart> carts)
+        private void GetTotalOfPromotionSKU(List<PromotinSkus> promotinSkus, List<Cart> carts,out decimal quotientPromotion, out decimal reminderPromotion)
         {
-            decimal totalAmount = 0M;
+            quotientPromotion = 0M;reminderPromotion = 0M;
             var intermediate =
 
                  promotinSkus.Select(p => new
@@ -80,14 +87,13 @@ namespace PromotionEngine
 
             var MinQuotient = intermediate.Min(m => m.quotient);
 
-            totalAmount += GetTotalAmount(MinQuotient, GetPromotionPrice(promotinSkus.ElementAt(0).Id));
+            quotientPromotion += GetTotalAmount(MinQuotient, GetPromotionPrice(promotinSkus.FirstOrDefault().Id));
 
             foreach (var itm in intermediate)
             {
                 var reminder = (itm.quotient - MinQuotient) * itm.promoteSKUQuality + itm.reminder;
-                totalAmount += GetTotalAmount(reminder, itm.SkuPrice);
+                reminderPromotion += GetTotalAmount(reminder, itm.SkuPrice);
             }
-            return totalAmount;
         }
 
         private decimal GetPromotionPrice(char sku)

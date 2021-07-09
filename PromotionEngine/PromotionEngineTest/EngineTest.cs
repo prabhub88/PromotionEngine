@@ -172,7 +172,7 @@ namespace PromotionEngineTest
             };
 
             Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(565, engine.CalculateTotalOrderValue());
+            Assert.AreEqual(540, engine.CalculateTotalOrderValue());
         }
 
         [TestMethod]
@@ -199,7 +199,7 @@ namespace PromotionEngineTest
             };
 
             Engine engine = new Engine(products, promotins);
-            Assert.AreEqual(565, engine.CalculateTotalOrderValue());
+            Assert.AreEqual(540, engine.CalculateTotalOrderValue());
         }
     }
 
