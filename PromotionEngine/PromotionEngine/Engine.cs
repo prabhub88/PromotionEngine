@@ -29,12 +29,13 @@ namespace PromotionEngine
             {
                 foreach (var promo in _promotins.Select(s => s.SKUs))
                 {
-                    var tmp = promo.SelectMany(p => _skus.FindAll(s => p.Id == s.sku.Id && p.Count <= s.Quanity)).ToList();
+                    var tmp = GetPromotionEligibleSKU(promo);
                     if (tmp.Count == 0) continue;
-                    findOfferedTotal = GetTotalOfPromotionSKU(promo,tmp);
-                    var nonpromotinskus= _skus.Except(tmp).ToList();
-                    findOfferedTotal += nonpromotinskus.Sum(s => s.sku.Price * s.Quanity);
-                    break;
+                    findOfferedTotal = GetTotalOfPromotionSKU(promo, tmp);
+
+                    var nonpromotionsku = GetNonPromotionSKUs(tmp);
+                    findOfferedTotal += GetTotalOfNonPromotionSKUs(nonpromotionsku);
+
                 }
             }
             return findOfferedTotal;
@@ -88,6 +89,20 @@ namespace PromotionEngine
         private decimal GetTotalAmount(int qty, decimal price)
         {
             return qty * price;
+        }
+
+        private List<Cart> GetPromotionEligibleSKU(List<PromotinSkus> promotinSku)
+        {
+            return promotinSku.SelectMany(p => _skus.FindAll(s => p.Id == s.sku.Id && p.Count <= s.Quanity)).ToList();
+        }
+        private List<Cart> GetNonPromotionSKUs(List<Cart> carts)
+        {
+            return _skus.Except(carts).ToList();
+        }
+
+        private decimal GetTotalOfNonPromotionSKUs(List<Cart> carts)
+        {
+            return carts.Sum(s => s.sku.Price * s.Quanity);
         }
     }
 }

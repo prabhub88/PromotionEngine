@@ -80,5 +80,28 @@ namespace PromotionEngineTest
             Engine engine = new Engine(products, promotins);
             Assert.AreEqual(575, engine.CalculateTotalOrderValue());
         }
+
+        [TestMethod]
+        public void Verify_CD_SKU_offer_total()
+        {
+
+            products = new List<Cart>
+        {
+            new Cart{ sku=new SKU{ Id='A',Price= 50M }, Quanity=5 },
+            new Cart{ sku=new SKU{ Id='B',Price= 30M }, Quanity=7 },
+            new Cart{ sku=new SKU{ Id='C',Price= 20M }, Quanity=4 },
+            new Cart{ sku=new SKU{ Id='D',Price= 15M }, Quanity=3 }
+        };
+
+
+            promotins = new List<Promotion> {
+                new Promotion{ SKUs= new List<PromotinSkus>{ new PromotinSkus { Id = 'C', Count = 2 }
+
+                ,new PromotinSkus{  Count=1, Id='D'} },  DiscountPrice=30M }
+            };
+
+            Engine engine = new Engine(products, promotins);
+            Assert.AreEqual(535, engine.CalculateTotalOrderValue());
+        }
     }
 }
