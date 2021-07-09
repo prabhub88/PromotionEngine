@@ -30,8 +30,8 @@ namespace PromotionEngine
                 foreach (var promo in _promotins.Select(s => s.SKUs))
                 {
                     var tmp = GetPromotionEligibleSKU(promo);
-                    if (tmp.Count == 0) continue;
-                    findOfferedTotal = GetTotalOfPromotionSKU(promo, tmp);
+                    if(tmp.Count > 0)
+                        findOfferedTotal = GetTotalOfPromotionSKU(promo, tmp);
 
                     var nonpromotionsku = GetNonPromotionSKUs(tmp);
                     findOfferedTotal += GetTotalOfNonPromotionSKUs(nonpromotionsku);
